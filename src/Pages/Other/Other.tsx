@@ -48,7 +48,7 @@ export default function Other() {
   useEffect(() => {
     dispatch(getCategory())
     dispatch(getBrand())
-  }, [])
+  }, [dispatch])
 
   const handleAddBrand = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

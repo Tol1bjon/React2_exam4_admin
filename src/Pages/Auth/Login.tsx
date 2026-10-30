@@ -19,7 +19,7 @@ export default function Login() {
     resolver: zodResolver(LoginSchema)
   })
 
-  const Onsubmit = async(data: LoginForm) => {
+  const Onsubmit = async (data: LoginForm) => {
     const res = await dispatch(LoginUser(data))
 
     if(LoginUser.fulfilled.match(res)){

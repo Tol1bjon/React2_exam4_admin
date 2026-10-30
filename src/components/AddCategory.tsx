@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 import { AddCategory as addCategoryThunk } from '../Store/Redux'
 import type { AppDispatch } from '../Store/Store'
-import { useState } from 'react'
 
 type AddCategoryProps = {
   open: boolean

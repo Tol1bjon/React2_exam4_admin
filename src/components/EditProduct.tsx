@@ -4,7 +4,7 @@ import type { ChangeEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getBrand, getCategory, getColor, getProduct } from '../Store/Redux'
+import { EditProduct as editProductThunk, getBrand, getCategory, getColor, getProduct } from '../Store/Redux'
 import type { AppDispatch, RootState } from '../Store/Store'
 
 const fieldClass = 'h-10 w-full rounded border border-[#dedede] bg-white px-3 text-sm text-[#171d2a] outline-none placeholder:text-[#8a8a8a] focus:border-[#2860ed]'
@@ -39,7 +39,7 @@ export default function EditProduct() {
     const [imagePreviews, setImagePreviews] = useState<{ file: File; url: string }[]>([])
     const imagePreviewsRef = useRef<{ file: File; url: string }[]>([])
 
-     const { register, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } = useForm<EditProductForm>({
+     const { register, handleSubmit, reset, setValue, watch } = useForm<EditProductForm>({
         defaultValues: {
           productName: '',
           code: '',
@@ -79,7 +79,8 @@ export default function EditProduct() {
       }, [dispatch])
 
       const Onsubmit = () => {
-        dispatch(EditProduct(product.id, product))
+        if (!product) return
+        dispatch(editProductThunk({ id: product.id, product }))
         navigate('/dashboard/products')
       }
 

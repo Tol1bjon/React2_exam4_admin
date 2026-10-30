@@ -3,22 +3,32 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { axiosRequest, getToken, GetUser, removeToken, saveToken } from '../lib/Token'
 import type { LoginForm } from '../Schema/Schema'
 
-export const LoginUser = createAsyncThunk('Data/LoginUser', async (info, { rejectWithValue }) => {
-  try {
-    const { data } = await axiosRequest.post('/Account/login', info)
-    const token = data.data
-    saveToken(token)
-    return token
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message)
-  }
-})
+export const LoginUser = createAsyncThunk<string, LoginForm, { rejectValue: string }>(
+  'Data/LoginUser',
+  async (info, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosRequest.post('/Account/login', info)
+      const token = data.data
+      saveToken(token)
+      return token
+    } catch (error: unknown) {
+      const message = axios.isAxiosError(error)
+        ? error.response?.data?.message ?? error.message
+        : error instanceof Error
+          ? error.message
+          : 'Login failed'
+      return rejectWithValue(message)
+    }
+  },
+)
 
 
 
 
 
-export const getBrand = createAsyncThunk('Data/getBrand', async () => {
+export const getBrand = createAsyncThunk<{ id: number; brandName: string }[], void>(
+  'Data/getBrand',
+  async () => {
     try {
       const { data } = await axiosRequest.get('/Brand/get-brands')
       return data.data
@@ -28,7 +38,7 @@ export const getBrand = createAsyncThunk('Data/getBrand', async () => {
   },
 )
 
-export const addBrand = createAsyncThunk('Data/addBrand', async (brandName, { dispatch }) => {
+export const addBrand = createAsyncThunk<void, string>('Data/addBrand', async (brandName, { dispatch }) => {
     try {
         await axiosRequest.post('/Brand/add-brand', { BrandName: brandName })
         dispatch(getBrand())
@@ -38,7 +48,7 @@ export const addBrand = createAsyncThunk('Data/addBrand', async (brandName, { di
   },
 )
 
-export const editBrand = createAsyncThunk('Data/editBrand', async ({ id, brandName }: any, { dispatch, rejectWithValue }) => {
+export const editBrand = createAsyncThunk<void, { id: number; brandName: string }>('Data/editBrand', async ({ id, brandName }, { dispatch }) => {
     try {
         axiosRequest.put(`/Brand/update-brand?Id=${id}`, { BrandName: brandName })
         dispatch(getBrand())
@@ -48,7 +58,7 @@ export const editBrand = createAsyncThunk('Data/editBrand', async ({ id, brandNa
   }
 )
 
-export const deleteBrand = createAsyncThunk('Data/deleteBrand', async (id, { dispatch }) => {
+export const deleteBrand = createAsyncThunk<void, number>('Data/deleteBrand', async (id, { dispatch }) => {
     try {
         axiosRequest.delete(`/Brand/delete-brand?id=${id}`)
         dispatch(getBrand())
@@ -109,7 +119,7 @@ export const addProduct = createAsyncThunk('Data/addProduct', async (newProduct,
 })
 
 
-export const EditProduct = createAsyncThunk('Data/EditProduct', async({id, product}: any, {dispatch}) => {
+export const EditProduct = createAsyncThunk<void, { id: number; product: unknown }>('Data/EditProduct', async({id, product}, {dispatch}) => {
     try {
         await axiosRequest.put(`/Product/update-product?Id=${id}`, product)
         dispatch(getProduct())
@@ -119,7 +129,7 @@ export const EditProduct = createAsyncThunk('Data/EditProduct', async({id, produ
 })
 
 
-export const AddCategory = createAsyncThunk('Data/AddCategory', async (newCategory, { dispatch }) => {
+export const AddCategory = createAsyncThunk<void, FormData>('Data/AddCategory', async (newCategory, { dispatch }) => {
     try {
         await axiosRequest.post('/Category/add-category', newCategory)
         dispatch(getCategory())
@@ -128,7 +138,7 @@ export const AddCategory = createAsyncThunk('Data/AddCategory', async (newCatego
     }
 })
 
-export const EditCategory = createAsyncThunk(
+export const EditCategory = createAsyncThunk<void, FormData>(
   'Data/EditCategory',
   async (updatedCategory, { dispatch }) => {
     try {
