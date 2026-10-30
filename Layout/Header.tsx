@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Bell, ChevronDown, Search } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import logo from '../src/assets/Group 1116606595 (1).png'
@@ -7,9 +8,12 @@ type AdminClaims = {
   name?: string
   userName?: string
   unique_name?: string
+  email?: string
+  role?: string
 }
 
 export default function Header() {
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
   const admin = useSelector((state: RootState) => state.auth.user) as AdminClaims | null
   const adminName = admin?.name ?? admin?.userName ?? admin?.unique_name ?? 'Admin'
   const initial = adminName.charAt(0).toUpperCase()
@@ -30,11 +34,28 @@ export default function Header() {
             5
           </span>
         </div>
-        <div aria-hidden="true" className="grid size-10 place-items-center rounded-full bg-emerald-500 text-lg font-semibold max-md:size-8 max-md:text-sm">
-          {initial}
+        <div className="relative">
+          <button
+            type="button"
+            aria-label="Admin account"
+            aria-expanded={isAdminMenuOpen}
+            onClick={() => setIsAdminMenuOpen((isOpen) => !isOpen)}
+            className="flex items-center gap-3 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-white/70 max-md:gap-2"
+          >
+            <span aria-hidden="true" className="grid size-10 place-items-center rounded-full bg-emerald-500 text-lg font-semibold max-md:size-8 max-md:text-sm">
+              {initial}
+            </span>
+            <span className="text-base max-md:hidden">{adminName}</span>
+            <ChevronDown aria-hidden="true" className={`size-5 transition-transform max-md:hidden ${isAdminMenuOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {isAdminMenuOpen && (
+            <div className="absolute right-0 top-full z-30 mt-3 w-64 rounded-md bg-white p-4 text-[#171d2a] shadow-xl">
+              <p className="text-sm font-semibold">{adminName}</p>
+              {admin?.email && <p className="mt-1 break-all text-sm text-[#777]">{admin.email}</p>}
+              {admin?.role && <p className="mt-3 border-t border-[#dedede] pt-3 text-sm text-[#777]">{admin.role}</p>}
+            </div>
+          )}
         </div>
-        <span className="text-base max-md:hidden">{adminName}</span>
-        <ChevronDown aria-hidden="true" className="size-5 max-md:hidden" />
       </div>
     </header>
   )
